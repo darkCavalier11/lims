@@ -22,6 +22,16 @@ var book = models.Book{
 	Rating:      4.3,
 }
 
+var testUser = models.User{
+	UserId:    "",
+	FirstName: "Test",
+	LastName:  "User",
+	Gender:    "Male",
+	Email:     "test@user.com",
+	Password:  "123456",
+	IsAdmin:   false,
+}
+
 func TestSearchBook(t *testing.T) {
 	err := Connect()
 	defer Lib.db.Close()
@@ -43,8 +53,7 @@ func TestAddBook(t *testing.T) {
 	id, err := Lib.AddBook(&book)
 	require.Equal(t, err, nil, "Unable to insert new book")
 	require.Equal(t, bookId, *id, "Invalid book id")
-	book.BookId = "444"
-	id, err = Lib.AddBook(&book)
+	//id, err = Lib.AddBook(&book)
 	// require.NotEqual(t, err, nil, "Adding already book")
 	// require.Equal(t, id, nil, "Duplicate book added")
 }
@@ -61,4 +70,15 @@ func TestDeleteBook(t *testing.T) {
 	deleteId, err := Lib.DeleteBook(*id)
 	require.Equal(t, err, nil, "Unable to delete the book")
 	require.Equal(t, deleteId, id, "Invalid book id")
+}
+
+func TestAddUser(t *testing.T) {
+	err := Connect()
+	defer Lib.db.Close()
+	require.Equal(t, err, nil)
+	userId := uuid.New().String()
+	testUser.UserId = userId
+	id, err := Lib.AddUser(&testUser)
+	require.Equal(t, err, nil, "Unable to add user")
+	require.Equal(t, *id, userId, "Invalid user id")
 }

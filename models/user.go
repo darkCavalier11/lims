@@ -7,5 +7,5 @@ type User struct {
 	Gender    string
 	Email     string
 	Password  string
-	IsAdmin   string
+	IsAdmin   bool
 }

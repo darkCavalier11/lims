@@ -53,9 +53,11 @@ func TestAddBook(t *testing.T) {
 	id, err := Lib.AddBook(&book)
 	require.Equal(t, err, nil, "Unable to insert new book")
 	require.Equal(t, bookId, *id, "Invalid book id")
-	//id, err = Lib.AddBook(&book)
-	// require.NotEqual(t, err, nil, "Adding already book")
-	// require.Equal(t, id, nil, "Duplicate book added")
+
+	// Fail adding duplicate book
+	id, err = Lib.AddBook(&book)
+	require.NotEqual(t, err, nil, "Adding already book")
+	require.Nil(t, id)
 }
 
 func TestDeleteBook(t *testing.T) {
@@ -81,4 +83,10 @@ func TestAddUser(t *testing.T) {
 	id, err := Lib.AddUser(&testUser)
 	require.Equal(t, err, nil, "Unable to add user")
 	require.Equal(t, *id, userId, "Invalid user id")
+	// Inserting again the user with same email fails.
+	userId = uuid.New().String()
+	testUser.UserId = userId
+	id, err = Lib.AddUser(&testUser)
+	require.NotNilf(t, err, "Added duplicate user")
+	require.Nil(t, id, "Invalid user id")
 }

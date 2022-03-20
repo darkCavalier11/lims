@@ -124,7 +124,6 @@ func (lib *library) DeleteUser(userId string) (id *string, e error) {
 			e = err
 		}
 	}(row)
-	fmt.Println(row)
 	if err != nil {
 		return nil, fmt.Errorf("-> unable delete user %w", err)
 	}
@@ -134,4 +133,14 @@ func (lib *library) DeleteUser(userId string) (id *string, e error) {
 		return nil, err
 	}
 	return &deletedUserId, e
+}
+
+func (lib *library) SearchUser(email string) (resultUser *models.User, err error) {
+	var user models.User
+	sqlStatement := `SELECT * FROM reguser WHERE email = $1`
+	err = lib.db.QueryRow(sqlStatement, email).Scan(&user.UserId, &user.FirstName, &user.LastName, &user.Gender, &user.Email, &user.Password, &user.IsAdmin)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
 }

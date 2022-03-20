@@ -105,3 +105,15 @@ func TestAddAndDeleteUser(t *testing.T) {
 	require.Nil(t, err, "unable to delete user", err)
 	require.NotNil(t, deleteUserId, "Invalid id")
 }
+
+func TestSearchUser(t *testing.T) {
+	err := Connect(host, port, user, password, dbname)
+	defer Lib.db.Close()
+	require.Nil(t, err, "unable to connect to db")
+	testUser.UserId = uuid.New().String()
+	Lib.AddUser(&testUser)
+	resultUser, err := Lib.SearchUser(testUser.Email)
+	require.Equal(t, err, nil, "Error while searching", err)
+	require.Equal(t, *resultUser, testUser)
+	Lib.DeleteUser(testUser.UserId)
+}

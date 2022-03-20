@@ -18,8 +18,16 @@ var testUser = models.User{
 	IsAdmin:   false,
 }
 
+const (
+	host     = "localhost"
+	port     = 5432
+	user     = "limsdb"
+	password = "password123"
+	dbname   = "lims"
+)
+
 func main() {
-	err := db.Connect()
+	err := db.Connect(host, port, user, password, dbname)
 	if err != nil {
 		log.Fatalf("Unable to connect to db %v", err)
 	}

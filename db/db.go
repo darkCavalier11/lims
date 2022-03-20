@@ -8,14 +8,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-const (
-	host     = "localhost"
-	port     = 5432
-	user     = "limsdb"
-	password = "password123"
-	dbname   = "lims"
-)
-
 type library struct {
 	db *sql.DB
 }
@@ -26,7 +18,7 @@ var Lib *library
 // It creates a db struct Lib internally that can be accessed
 // by other module that can use listed methods only.
 // Must be invoked in main to be used in other modules.
-func Connect() error {
+func Connect(host string, port int, user string, password string, dbname string) error {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)

@@ -1,11 +1,20 @@
 package db
 
 import (
-	"github.com/darkCavalier11/lims/models"
-	"github.com/google/uuid"
 	"testing"
 
+	"github.com/darkCavalier11/lims/models"
+	"github.com/google/uuid"
+
 	"github.com/stretchr/testify/require"
+)
+
+const (
+	host     = "localhost"
+	port     = 5432
+	user     = "limsdb"
+	password = "password123"
+	dbname   = "lims"
 )
 
 var book = models.Book{
@@ -33,7 +42,7 @@ var testUser = models.User{
 }
 
 func TestSearchBook(t *testing.T) {
-	err := Connect()
+	err := Connect(host, port, user, password, dbname)
 	defer Lib.db.Close()
 	require.Equal(t, err, nil)
 	bookQuery := []string{"Harry Potter", "Wizard ", "World", "Magic", "time", "Asweqzxxxvvffrtder"}
@@ -45,7 +54,8 @@ func TestSearchBook(t *testing.T) {
 }
 
 func TestAddBook(t *testing.T) {
-	err := Connect()
+	err := Connect(host, port, user, password, dbname)
+
 	defer Lib.db.Close()
 	require.Equal(t, err, nil)
 	bookId := uuid.New().String()
@@ -61,7 +71,8 @@ func TestAddBook(t *testing.T) {
 }
 
 func TestDeleteBook(t *testing.T) {
-	err := Connect()
+	err := Connect(host, port, user, password, dbname)
+
 	defer Lib.db.Close()
 	require.Equal(t, err, nil)
 	bookId := uuid.New().String()
@@ -74,8 +85,8 @@ func TestDeleteBook(t *testing.T) {
 	require.Equal(t, deleteId, id, "Invalid book id")
 }
 
-func TestAddUser(t *testing.T) {
-	err := Connect()
+func TestAddAndDeleteUser(t *testing.T) {
+	err := Connect(host, port, user, password, dbname)
 	defer Lib.db.Close()
 	require.Equal(t, err, nil)
 	userId := uuid.New().String()
@@ -83,10 +94,14 @@ func TestAddUser(t *testing.T) {
 	id, err := Lib.AddUser(&testUser)
 	require.Equal(t, err, nil, "Unable to add user")
 	require.Equal(t, *id, userId, "Invalid user id")
+
 	// Inserting again the user with same email fails.
 	userId = uuid.New().String()
 	testUser.UserId = userId
-	id, err = Lib.AddUser(&testUser)
+	duplicateUserid, err := Lib.AddUser(&testUser)
 	require.NotNilf(t, err, "Added duplicate user")
-	require.Nil(t, id, "Invalid user id")
+	require.Nil(t, duplicateUserid, "Invalid user id")
+	deleteUserId, err := Lib.DeleteUser(*id)
+	require.Nil(t, err, "unable to delete user", err)
+	require.NotNil(t, deleteUserId, "Invalid id")
 }

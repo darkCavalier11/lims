@@ -64,6 +64,7 @@ func (lib *library) AddBook(book *models.Book) (id *string, e error) {
 
 func (lib *library) DeleteBook(bookId string) (id *string, e error) {
 	sqlStatement := `DELETE FROM book where book_id = $1 returning book_id`
+	var deletedBookId string
 	row, err := lib.db.Query(sqlStatement, bookId)
 	defer func(row *sql.Rows) {
 		if row == nil {
@@ -78,11 +79,11 @@ func (lib *library) DeleteBook(bookId string) (id *string, e error) {
 		return nil, fmt.Errorf("-> unable to add book %w", err)
 	}
 	row.Next()
-	err = row.Scan(&bookId)
+	err = row.Scan(&deletedBookId)
 	if err != nil {
 		return nil, err
 	}
-	return &bookId, e
+	return &deletedBookId, e
 }
 
 func (lib *library) AddUser(user *models.User) (id *string, e error) {
@@ -107,4 +108,30 @@ func (lib *library) AddUser(user *models.User) (id *string, e error) {
 		return nil, fmt.Errorf("unable to add user %w", err)
 	}
 	return &userId, e
+}
+
+func (lib *library) DeleteUser(userId string) (id *string, e error) {
+	var deletedUserId string
+	sqlStatement := `DELETE FROM reguser where user_id = $1 returning user_id`
+	row, err := lib.db.Query(sqlStatement, userId)
+	defer func(row *sql.Rows) {
+		if row == nil {
+			return
+		}
+		err := row.Close()
+		if err != nil {
+			deletedUserId = ""
+			e = err
+		}
+	}(row)
+	fmt.Println(row)
+	if err != nil {
+		return nil, fmt.Errorf("-> unable delete user %w", err)
+	}
+	row.Next()
+	err = row.Scan(&deletedUserId)
+	if err != nil {
+		return nil, err
+	}
+	return &deletedUserId, e
 }

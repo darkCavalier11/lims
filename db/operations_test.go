@@ -112,7 +112,7 @@ func TestSearchUser(t *testing.T) {
 	require.Nil(t, err, "unable to connect to db")
 	testUser.UserId = uuid.New().String()
 	Lib.AddUser(&testUser)
-	resultUser, err := Lib.SearchUser(testUser.Email)
+	resultUser, err := Lib.SearchUserByEmail(testUser.Email)
 	require.Equal(t, err, nil, "Error while searching", err)
 	require.Equal(t, *resultUser, testUser)
 	Lib.DeleteUser(testUser.UserId)

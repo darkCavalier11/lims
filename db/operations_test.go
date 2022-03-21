@@ -2,6 +2,7 @@ package db
 
 import (
 	"testing"
+	"time"
 
 	"github.com/darkCavalier11/lims/models"
 	"github.com/google/uuid"
@@ -17,7 +18,7 @@ const (
 	dbname   = "lims"
 )
 
-var book = models.Book{
+var testBook = models.Book{
 	BookId:      "",
 	Isbn:        "123456789",
 	Title:       "Testbook",
@@ -41,6 +42,14 @@ var testUser = models.User{
 	IsAdmin:   false,
 }
 
+var testIssueBook = models.BookIssue{
+	IssueId:    "",
+	UserId:     "",
+	BookId:     "",
+	IssueDate:  time.Now().Format(time.RFC3339),
+	ReturnDate: time.Date(2050, 11, 12, 12, 25, 45, 1, time.UTC).Format(time.RFC3339),
+}
+
 func TestSearchBook(t *testing.T) {
 	err := Connect(host, port, user, password, dbname)
 	defer Lib.db.Close()
@@ -59,13 +68,13 @@ func TestAddBook(t *testing.T) {
 	defer Lib.db.Close()
 	require.Equal(t, err, nil)
 	bookId := uuid.New().String()
-	book.BookId = bookId
-	id, err := Lib.AddBook(&book)
+	testBook.BookId = bookId
+	id, err := Lib.AddBook(&testBook)
 	require.Equal(t, err, nil, "Unable to insert new book")
 	require.Equal(t, bookId, *id, "Invalid book id")
 
 	// Fail adding duplicate book
-	id, err = Lib.AddBook(&book)
+	id, err = Lib.AddBook(&testBook)
 	require.NotEqual(t, err, nil, "Adding already book")
 	require.Nil(t, id)
 }
@@ -76,8 +85,8 @@ func TestDeleteBook(t *testing.T) {
 	defer Lib.db.Close()
 	require.Equal(t, err, nil)
 	bookId := uuid.New().String()
-	book.BookId = bookId
-	id, err := Lib.AddBook(&book)
+	testBook.BookId = bookId
+	id, err := Lib.AddBook(&testBook)
 	require.Equal(t, err, nil, "Unable to insert new book")
 	require.Equal(t, bookId, *id, "Invalid book id")
 	deleteId, err := Lib.DeleteBook(*id)
@@ -116,4 +125,23 @@ func TestSearchUser(t *testing.T) {
 	require.Equal(t, err, nil, "Error while searching", err)
 	require.Equal(t, *resultUser, testUser)
 	Lib.DeleteUser(testUser.UserId)
+}
+
+func TestIssueBook(t *testing.T) {
+	err := Connect(host, port, user, password, dbname)
+	defer Lib.db.Close()
+	require.Nil(t, err, "unable to connect to db")
+	userId := uuid.New().String()
+	bookId := uuid.New().String()
+	issueId := uuid.New().String()
+	testUser.UserId = userId
+	testBook.BookId = bookId
+	testIssueBook.IssueId = issueId
+	Lib.AddBook(&testBook)
+	Lib.AddUser(&testUser)
+	retIssueId, err := Lib.IssueBook(&testIssueBook)
+	require.Equal(t, err, nil, "error issuing book", err)
+	require.Equal(t, issueId, *retIssueId, "invalid issue id")
+	Lib.DeleteBook(bookId)
+	Lib.DeleteUser(userId)
 }

@@ -152,3 +152,14 @@ func (lib *library) SearchUserByEmail(email string) (resultUser *models.User, er
 	}
 	return &user, nil
 }
+
+// IssueBook issues a book to an user
+func (lib *library) IssueBook(issue *models.BookIssue) (id *string, e error) {
+	var issueId string
+	sqlStatement := `INSERT INTO bookissue (issue_id, user_id, book_id, issue_date, return_date) VALUES ($1, $2, $3, $4, $5) RETURNING issue_id`
+	err := lib.db.QueryRow(sqlStatement, issue.IssueId, issue.UserId, issue.BookId, issue.IssueDate, issue.ReturnDate).Scan(&issueId)
+	if err != nil {
+		return nil, fmt.Errorf("unable to issue book %w", err)
+	}
+	return &issueId, nil
+}

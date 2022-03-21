@@ -33,7 +33,8 @@ CREATE TABLE Review
     "user_id" varchar(200) NOT NULL,
     "book_id" varchar(200) NOT NULL,
     "comment" text,
-    "rating" int
+    "rating" int,
+    "date" varchar(200)
 );
 
 CREATE TABLE BookIssue
@@ -41,8 +42,8 @@ CREATE TABLE BookIssue
     "issue_id" varchar(200) PRIMARY KEY,
     "user_id" varchar(200) NOT NULL,
     "book_id" varchar(200) NOT NULL,
-    "issue_date" date,
-    "return_date" date
+    "issue_date" varchar(200),
+    "return_date" varchar(200)
 );
 
 ALTER TABLE Review ADD FOREIGN KEY ("user_id") REFERENCES RegUser ("user_id");

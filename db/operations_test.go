@@ -1,6 +1,7 @@
 package db
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -122,6 +123,7 @@ func TestSearchUser(t *testing.T) {
 	testUser.UserId = uuid.New().String()
 	Lib.AddUser(&testUser)
 	resultUser, err := Lib.SearchUserByEmail(testUser.Email)
+	fmt.Println(*resultUser, testUser)
 	require.Equal(t, err, nil, "Error while searching", err)
 	require.Equal(t, *resultUser, testUser)
 	Lib.DeleteUser(testUser.UserId)
@@ -137,11 +139,17 @@ func TestIssueBook(t *testing.T) {
 	testUser.UserId = userId
 	testBook.BookId = bookId
 	testIssueBook.IssueId = issueId
+	testIssueBook.UserId = userId
+	testIssueBook.BookId = bookId
 	Lib.AddBook(&testBook)
 	Lib.AddUser(&testUser)
 	retIssueId, err := Lib.IssueBook(&testIssueBook)
 	require.Equal(t, err, nil, "error issuing book", err)
 	require.Equal(t, issueId, *retIssueId, "invalid issue id")
+	isAvailable, resIssueId, err := Lib.CheckBookAvailability(bookId)
+	require.Nil(t, err, "error ", err)
+	require.False(t, *isAvailable, "book is still available")
+	require.Equal(t, *resIssueId, issueId, "invalid book id")
 	Lib.DeleteBook(bookId)
 	Lib.DeleteUser(userId)
 }

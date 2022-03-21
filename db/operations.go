@@ -163,3 +163,20 @@ func (lib *library) IssueBook(issue *models.BookIssue) (id *string, e error) {
 	}
 	return &issueId, nil
 }
+
+func (lib *library) CheckBookAvailability(bookId string) (*bool, *string, error) {
+	var issueId string
+	var isAvailable bool
+	sqlStatement := `SELECT issue_id FROM bookissue where book_id = $1`
+	err := lib.db.QueryRow(sqlStatement, bookId).Scan(&issueId)
+	fmt.Println(err)
+	if err == sql.ErrNoRows {
+		isAvailable = true
+		return &isAvailable, nil, nil
+	}
+	if err != nil {
+		return nil, nil, err
+	}
+	isAvailable = false
+	return &isAvailable, &issueId, nil
+}

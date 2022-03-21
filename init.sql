@@ -43,7 +43,8 @@ CREATE TABLE BookIssue
     "user_id" varchar(200) NOT NULL,
     "book_id" varchar(200) NOT NULL,
     "issue_date" varchar(200),
-    "return_date" varchar(200)
+    "return_date" varchar(200),
+    "returned" boolean
 );
 
 ALTER TABLE Review ADD FOREIGN KEY ("user_id") REFERENCES RegUser ("user_id");

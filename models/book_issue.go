@@ -6,4 +6,5 @@ type BookIssue struct {
 	BookId     string
 	IssueDate  string
 	ReturnDate string
+	Returned   bool
 }

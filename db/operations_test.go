@@ -1,7 +1,6 @@
 package db
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -49,6 +48,7 @@ var testIssueBook = models.BookIssue{
 	BookId:     "",
 	IssueDate:  time.Now().Format(time.RFC3339),
 	ReturnDate: time.Date(2050, 11, 12, 12, 25, 45, 1, time.UTC).Format(time.RFC3339),
+	Returned:   false,
 }
 
 func TestSearchBook(t *testing.T) {
@@ -123,7 +123,6 @@ func TestSearchUser(t *testing.T) {
 	testUser.UserId = uuid.New().String()
 	Lib.AddUser(&testUser)
 	resultUser, err := Lib.SearchUserByEmail(testUser.Email)
-	fmt.Println(*resultUser, testUser)
 	require.Equal(t, err, nil, "Error while searching", err)
 	require.Equal(t, *resultUser, testUser)
 	Lib.DeleteUser(testUser.UserId)
@@ -143,13 +142,26 @@ func TestIssueBook(t *testing.T) {
 	testIssueBook.BookId = bookId
 	Lib.AddBook(&testBook)
 	Lib.AddUser(&testUser)
+
+	// Issue a book
 	retIssueId, err := Lib.IssueBook(&testIssueBook)
 	require.Equal(t, err, nil, "error issuing book", err)
 	require.Equal(t, issueId, *retIssueId, "invalid issue id")
+
+	// Check the availability of book
 	isAvailable, resIssueId, err := Lib.CheckBookAvailability(bookId)
 	require.Nil(t, err, "error ", err)
 	require.False(t, *isAvailable, "book is still available")
 	require.Equal(t, *resIssueId, issueId, "invalid book id")
+
+	// Unissue the book
+	unIssueId, err := Lib.ReturnBook(bookId)
+	require.Nil(t, err, err)
+	require.Equal(t, *unIssueId, issueId, "invalid issue id")
+	isAvailable, retIssueId, err = Lib.CheckBookAvailability(bookId)
+	require.Nil(t, err, "error ", err)
+	require.Nil(t, retIssueId, "invalid issue id", err)
+	require.True(t, *isAvailable, "book is  unavailable", err)
 	Lib.DeleteBook(bookId)
 	Lib.DeleteUser(userId)
 }

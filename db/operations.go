@@ -201,3 +201,13 @@ func (lib *library) AddReview(review *models.Review) (*string, error) {
 	}
 	return &reviewId, nil
 }
+
+func (lib *library) DeleteReview(reviewId string) (*string, error) {
+	var deletedReviewId string
+	sqlStatement := `DELETE FROM review WHERE review_id = $1 RETURNING review_id`
+	err := lib.db.QueryRow(sqlStatement, reviewId).Scan(&deletedReviewId)
+	if err != nil {
+		return nil, err
+	}
+	return &deletedReviewId, nil
+}

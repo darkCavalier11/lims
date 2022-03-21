@@ -6,4 +6,6 @@ type Review struct {
 	BookId   string
 	Comment  string
 	Rating   int
+	Date     string
+	Edited   bool
 }

@@ -34,7 +34,8 @@ CREATE TABLE Review
     "book_id" varchar(200) NOT NULL,
     "comment" text,
     "rating" int,
-    "date" varchar(200)
+    "date" varchar(200),
+    "edited" boolean
 );
 
 CREATE TABLE BookIssue

@@ -191,3 +191,13 @@ func (lib *library) ReturnBook(bookId string) (*string, error) {
 	}
 	return &issueId, nil
 }
+
+func (lib *library) AddReview(review *models.Review) (*string, error) {
+	var reviewId string
+	sqlStatement := `INSERT INTO review (review_id, user_id, book_id, comment, rating, date, edited) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING review_id`
+	err := lib.db.QueryRow(sqlStatement, review.ReviewId, review.UserId, review.BookId, review.Comment, review.Rating, review.Date, review.Edited).Scan(&reviewId)
+	if err != nil {
+		return nil, err
+	}
+	return &reviewId, nil
+}

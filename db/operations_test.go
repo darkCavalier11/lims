@@ -51,6 +51,16 @@ var testIssueBook = models.BookIssue{
 	Returned:   false,
 }
 
+var testReview = models.Review{
+	ReviewId: "",
+	UserId:   "",
+	BookId:   "",
+	Comment:  "a test comment",
+	Rating:   5,
+	Date:     time.Now().Format(time.RFC3339),
+	Edited:   false,
+}
+
 func TestSearchBook(t *testing.T) {
 	err := Connect(host, port, user, password, dbname)
 	defer Lib.db.Close()
@@ -162,6 +172,27 @@ func TestIssueBook(t *testing.T) {
 	require.Nil(t, err, "error ", err)
 	require.Nil(t, retIssueId, "invalid issue id", err)
 	require.True(t, *isAvailable, "book is  unavailable", err)
+	Lib.DeleteBook(bookId)
+	Lib.DeleteUser(userId)
+}
+
+func TestAddReview(t *testing.T) {
+	err := Connect(host, port, user, password, dbname)
+	defer Lib.db.Close()
+	require.Nil(t, err, "unable to connect to db")
+	userId := uuid.New().String()
+	bookId := uuid.New().String()
+	reviewId := uuid.New().String()
+	testUser.UserId = userId
+	testBook.BookId = bookId
+	testReview.ReviewId = reviewId
+	testReview.UserId = userId
+	testReview.BookId = bookId
+	Lib.AddBook(&testBook)
+	Lib.AddUser(&testUser)
+	retIssueId, err := Lib.AddReview(&testReview)
+	require.Equal(t, err, nil, "error issuing book", err)
+	require.Equal(t, reviewId, *retIssueId, "invalid issue id")
 	Lib.DeleteBook(bookId)
 	Lib.DeleteUser(userId)
 }

@@ -23,8 +23,12 @@ func TestAddBook(t *testing.T) {
 
 	// Fail adding duplicate book
 	id, err = Lib.AddBook(&testBook)
-	require.NotEqual(t, err, nil, "Adding already book")
+	require.NotEqual(t, err, nil, "Adding already added book")
 	require.Nil(t, id)
+
+	retBook, err := Lib.GetBookById(testBook.BookId)
+	require.Equal(t, err, nil, err)
+	require.Equal(t, *retBook, testBook)
 }
 
 func TestDeleteBook(t *testing.T) {

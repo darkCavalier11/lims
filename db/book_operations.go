@@ -6,6 +6,16 @@ import (
 	"github.com/darkCavalier11/lims/models"
 )
 
+func (lib *library) GetBookById(bookId string) (bookList *models.Book, err error) {
+	var book models.Book
+	sqlStatement := `SELECT * FROM book WHERE book_id = $1`
+	err = lib.db.QueryRow(sqlStatement, bookId).Scan(&book.BookId, &book.Isbn, &book.Title, &book.Subtitle, &book.Author, &book.Published, &book.Publisher, &book.Pages, &book.Description, &book.ImageUrl, &book.Reviews, &book.Rating)
+	if err != nil {
+		return nil, err
+	}
+	return &book, nil
+}
+
 // SearchBook search a book based on title matching keyword
 func (lib *library) SearchBook(keyword string) (bookList []*models.Book, err error) {
 	book := &models.Book{}
@@ -21,7 +31,7 @@ func (lib *library) SearchBook(keyword string) (bookList []*models.Book, err err
 		}
 	}(rows)
 	for rows.Next() {
-		err := rows.Scan(&book.BookId, &book.Isbn, &book.Title, &book.Subtitle, &book.Author, &book.Published, &book.Publisher, &book.Pages, &book.Description, &book.ImageUrl)
+		err := rows.Scan(&book.BookId, &book.Isbn, &book.Title, &book.Subtitle, &book.Author, &book.Published, &book.Publisher, &book.Pages, &book.Description, &book.ImageUrl, &book.Reviews, &book.Rating)
 		if err != nil {
 			return nil, fmt.Errorf(" -> Unable to query %w", err)
 		}
@@ -39,10 +49,10 @@ func (lib *library) SearchBook(keyword string) (bookList []*models.Book, err err
 
 // AddBook adds a new book to the db. Should be only invoked by admin users.
 func (lib *library) AddBook(book *models.Book) (id *string, e error) {
-	sqlStatement := `INSERT INTO book(book_id, isbn, title, subtitle, author, published, publisher, pages, description, image_url)
-	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING book_id`
+	sqlStatement := `INSERT INTO book(book_id, isbn, title, subtitle, author, published, publisher, pages, description, image_url, reviews, rating)
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING book_id`
 	row, err := lib.db.Query(sqlStatement, book.BookId, book.Isbn, book.Title, book.Subtitle, book.Author, book.Published, book.Publisher,
-		book.Pages, book.Description, book.ImageUrl)
+		book.Pages, book.Description, book.ImageUrl, book.Reviews, book.Rating)
 	defer func(row *sql.Rows) {
 		if row == nil {
 			return
@@ -89,26 +99,21 @@ func (lib *library) DeleteBook(bookId string) (id *string, e error) {
 	return &deletedBookId, e
 }
 
-func (lib *library) GetReviewsOfBook(bookId string) ([]*models.Review, error) {
-	var reviews []*models.Review
-	sqlStatement := `SELECT * FROM review WHERE book_id = $1`
-	rows, err := lib.db.Query(sqlStatement, bookId)
+func (lib *library) GetBooksIssuedIdByUser(userId string) ([]*string, error) {
+	var bookList []*string
+	sqlStatement := `SELECT book_id FROM bookissue WHERE user_id = $1`
+	rows, err := lib.db.Query(sqlStatement, userId)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("unable to find books issued by user %w", err)
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var review models.Review
-		err := rows.Scan(&review.ReviewId, &review.UserId, &review.BookId, &review.Comment, &review.Rating, &review.Date, &review.Edited)
+		var bookId string
+		err := rows.Scan(&bookId)
 		if err != nil {
-			if err == sql.ErrNoRows {
-				return reviews, nil
-			}
-			if err != nil {
-				return nil, fmt.Errorf(" -> Unable to query %w", err)
-			}
+			return nil, fmt.Errorf(" -> Unable to query %w", err)
 		}
-		reviews = append(reviews, &review)
+		bookList = append(bookList, &bookId)
 	}
-	return reviews, nil
+	return bookList, nil
 }

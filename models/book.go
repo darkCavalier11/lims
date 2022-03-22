@@ -11,5 +11,6 @@ type Book struct {
 	Pages       int
 	Description string
 	ImageUrl    string
+	Reviews     int
 	Rating      float64
 }

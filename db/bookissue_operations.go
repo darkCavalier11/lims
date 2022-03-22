@@ -44,3 +44,13 @@ func (lib *library) ReturnBook(bookId string) (*string, error) {
 	}
 	return &issueId, nil
 }
+
+func (lib *library) GetIssueByIssueId(issueId string) (*models.BookIssue, error) {
+	var bookIssue models.BookIssue
+	sqlStatement := `SELECT * FROM bookissue WHERE issue_id = $1`
+	err := lib.db.QueryRow(sqlStatement, issueId).Scan(&bookIssue.IssueId, &bookIssue.UserId, &bookIssue.BookId, &bookIssue.IssueDate, &bookIssue.ReturnDate, &bookIssue.Returned)
+	if err != nil {
+		return nil, err
+	}
+	return &bookIssue, nil
+}

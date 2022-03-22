@@ -28,6 +28,10 @@ func TestIssueBook(t *testing.T) {
 	require.Equal(t, err, nil, "error issuing book", err)
 	require.Equal(t, issueId, *retIssueId, "invalid issue id")
 
+	bookIssue, err := Lib.GetIssueByIssueId(issueId)
+	require.Nil(t, err, err)
+	require.Equal(t, *bookIssue, testIssueBook, "invalid book issue document")
+
 	// Check the availability of book
 	isAvailable, resIssueId, err := Lib.CheckBookAvailability(bookId)
 	require.Nil(t, err, "error ", err)
@@ -42,5 +46,28 @@ func TestIssueBook(t *testing.T) {
 	require.Nil(t, err, "error ", err)
 	require.Nil(t, retIssueId, "invalid issue id", err)
 	require.True(t, *isAvailable, "book is  unavailable", err)
+}
 
+func TestGetBooksIssuedByUser(t *testing.T) {
+	err := Connect(host, port, user, password, dbname)
+	defer Lib.db.Close()
+	require.Nil(t, err, "unable to connect to db")
+	userId := uuid.New().String()
+	bookId := uuid.New().String()
+	issueId := uuid.New().String()
+	testUser.UserId = userId
+	testBook.BookId = bookId
+	testIssueBook.IssueId = issueId
+	testIssueBook.UserId = userId
+	testIssueBook.BookId = bookId
+	Lib.AddBook(&testBook)
+	Lib.AddUser(&testUser)
+	defer Lib.DeleteBook(bookId)
+	defer Lib.DeleteUser(userId)
+	retIssueId, err := Lib.IssueBook(&testIssueBook)
+	require.Equal(t, err, nil, "error issuing book", err)
+	require.Equal(t, issueId, *retIssueId, "invalid issue id")
+	booksIssued, err := Lib.GetBooksIssuedIdByUser(userId)
+	require.Nil(t, err, err)
+	require.Equal(t, *booksIssued[0], testBook.BookId, "invalid book")
 }

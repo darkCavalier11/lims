@@ -14,7 +14,9 @@ CREATE TABLE Book (
   "publisher" varchar(1200) NOT NULL,
   "pages" int,
   "description" text,
-  "image_url" varchar(1200)
+  "image_url" varchar(1200),
+  "reviews" int,
+  "rating" float
 );
 
 CREATE TABLE RegUser (

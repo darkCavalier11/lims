@@ -27,6 +27,7 @@ var testBook = models.Book{
 	Pages:       44,
 	Description: "description",
 	ImageUrl:    "url",
+	Reviews:     1,
 	Rating:      rand.Float64() * 5,
 }
 

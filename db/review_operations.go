@@ -1,6 +1,10 @@
 package db
 
-import "github.com/darkCavalier11/lims/models"
+import (
+	"database/sql"
+	"fmt"
+	"github.com/darkCavalier11/lims/models"
+)
 
 func (lib *library) AddReview(review *models.Review) (*string, error) {
 	var reviewId string
@@ -40,4 +44,28 @@ func (lib *library) GetReviewByReviewId(reviewId string) (*models.Review, error)
 		return nil, err
 	}
 	return &review, nil
+}
+
+func (lib *library) GetReviewsOfBook(bookId string) ([]*models.Review, error) {
+	var reviews []*models.Review
+	sqlStatement := `SELECT * FROM review WHERE book_id = $1`
+	rows, err := lib.db.Query(sqlStatement, bookId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var review models.Review
+		err := rows.Scan(&review.ReviewId, &review.UserId, &review.BookId, &review.Comment, &review.Rating, &review.Date, &review.Edited)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				return reviews, nil
+			}
+			if err != nil {
+				return nil, fmt.Errorf(" -> Unable to query %w", err)
+			}
+		}
+		reviews = append(reviews, &review)
+	}
+	return reviews, nil
 }

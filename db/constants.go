@@ -48,6 +48,7 @@ var testIssueBook = models.BookIssue{
 	IssueDate:  time.Now().Format(time.RFC3339),
 	ReturnDate: time.Date(2050, 11, 12, 12, 25, 45, 1, time.UTC).Format(time.RFC3339),
 	Returned:   false,
+	IssuerId:   "issuer-id-7578",
 }
 
 var testReview = models.Review{

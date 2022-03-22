@@ -45,6 +45,7 @@ CREATE TABLE BookIssue
     "issue_id" varchar(200) PRIMARY KEY,
     "user_id" varchar(200) NOT NULL,
     "book_id" varchar(200) NOT NULL,
+    "issuer_id" varchar(200) NOT NULL,
     "issue_date" varchar(200),
     "return_date" varchar(200),
     "returned" boolean

@@ -9,8 +9,8 @@ import (
 // IssueBook issues a book to an user
 func (lib *library) IssueBook(issue *models.BookIssue) (id *string, e error) {
 	var issueId string
-	sqlStatement := `INSERT INTO bookissue (issue_id, user_id, book_id, issue_date, return_date, returned) VALUES ($1, $2, $3, $4, $5, $6) RETURNING issue_id`
-	err := lib.db.QueryRow(sqlStatement, issue.IssueId, issue.UserId, issue.BookId, issue.IssueDate, issue.ReturnDate, issue.Returned).Scan(&issueId)
+	sqlStatement := `INSERT INTO bookissue (issue_id, user_id, book_id, issuer_id, issue_date, return_date, returned) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING issue_id`
+	err := lib.db.QueryRow(sqlStatement, issue.IssueId, issue.UserId, issue.BookId, issue.IssuerId, issue.IssueDate, issue.ReturnDate, issue.Returned).Scan(&issueId)
 	if err != nil {
 		return nil, fmt.Errorf("unable to issue book %w", err)
 	}
@@ -48,7 +48,7 @@ func (lib *library) ReturnBook(bookId string) (*string, error) {
 func (lib *library) GetIssueByIssueId(issueId string) (*models.BookIssue, error) {
 	var bookIssue models.BookIssue
 	sqlStatement := `SELECT * FROM bookissue WHERE issue_id = $1`
-	err := lib.db.QueryRow(sqlStatement, issueId).Scan(&bookIssue.IssueId, &bookIssue.UserId, &bookIssue.BookId, &bookIssue.IssueDate, &bookIssue.ReturnDate, &bookIssue.Returned)
+	err := lib.db.QueryRow(sqlStatement, issueId).Scan(&bookIssue.IssueId, &bookIssue.UserId, &bookIssue.BookId, &bookIssue.IssuerId, &bookIssue.IssueDate, &bookIssue.ReturnDate, &bookIssue.Returned)
 	if err != nil {
 		return nil, err
 	}

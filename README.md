@@ -1,4 +1,5 @@
 #lims
+
 lims short for Library Information Management System contains all the functionality to manage a 
 real world library functionalities. Contains 4 tables used to manage different data
 

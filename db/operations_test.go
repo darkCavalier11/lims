@@ -201,12 +201,20 @@ func TestAddEditDeleteReview(t *testing.T) {
 	testReview.Comment = "edited comment"
 
 	retIssueId, err = Lib.EditReview(&testReview)
-	require.Equal(t, err, nil, "error deleting review from the book", err)
+	require.Equal(t, err, nil, "error editing review from the book", err)
 	require.Equal(t, reviewId, *retIssueId, "invalid issue id")
+
+	editedReview, err := Lib.GetReviewByReviewId(reviewId)
+	require.Equal(t, err, nil, "error getting review from the book", err)
+	require.Equal(t, testReview, *editedReview, "invalid review")
 
 	retIssueId, err = Lib.DeleteReview(reviewId)
 	require.Equal(t, err, nil, "error deleting review from the book", err)
 	require.Equal(t, reviewId, *retIssueId, "invalid issue id")
 	Lib.DeleteBook(bookId)
 	Lib.DeleteUser(userId)
+}
+
+func TestGetReviewsOfBook(t *testing.T) {
+	
 }

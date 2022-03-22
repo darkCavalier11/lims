@@ -21,27 +21,28 @@ func TestAddEditDeleteReview(t *testing.T) {
 	testReview.BookId = bookId
 	Lib.AddBook(&testBook)
 	Lib.AddUser(&testUser)
+	defer Lib.DeleteBook(bookId)
+	defer Lib.DeleteUser(userId)
 
-	retIssueId, err := Lib.AddReview(&testReview)
+	retReviewId, err := Lib.AddReview(&testReview)
 	require.Equal(t, err, nil, "error adding review to the book", err)
-	require.Equal(t, reviewId, *retIssueId, "invalid issue id")
+	require.Equal(t, reviewId, *retReviewId, "invalid issue id")
 
 	testReview.Date = time.Now().Format(time.RFC3339)
 	testReview.Edited = true
 	testReview.Rating = 4
 	testReview.Comment = "edited comment"
 
-	retIssueId, err = Lib.EditReview(&testReview)
+	retReviewId, err = Lib.EditReview(&testReview)
 	require.Equal(t, err, nil, "error editing review from the book", err)
-	require.Equal(t, reviewId, *retIssueId, "invalid issue id")
+	require.Equal(t, reviewId, *retReviewId, "invalid issue id")
 
 	editedReview, err := Lib.GetReviewByReviewId(reviewId)
 	require.Equal(t, err, nil, "error getting review from the book", err)
 	require.Equal(t, testReview, *editedReview, "invalid review")
 
-	retIssueId, err = Lib.DeleteReview(reviewId)
+	retReviewId, err = Lib.DeleteReview(reviewId)
 	require.Equal(t, err, nil, "error deleting review from the book", err)
-	require.Equal(t, reviewId, *retIssueId, "invalid issue id")
-	Lib.DeleteBook(bookId)
-	Lib.DeleteUser(userId)
+	require.Equal(t, reviewId, *retReviewId, "invalid issue id")
+
 }

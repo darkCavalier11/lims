@@ -24,8 +24,8 @@ func (lib *library) DeleteReview(reviewId string) (*string, error) {
 
 func (lib *library) EditReview(review *models.Review) (*string, error) {
 	var reviewId string
-	sqlStatement := `UPDATE review SET comment = $1, rating = $2, date = $3, edited =$4 returning review_id`
-	err := lib.db.QueryRow(sqlStatement, review.Comment, review.Rating, review.Date, review.Edited).Scan(&reviewId)
+	sqlStatement := `UPDATE review SET comment = $1, rating = $2, date = $3, edited =$4 WHERE review_id = $5 returning review_id`
+	err := lib.db.QueryRow(sqlStatement, review.Comment, review.Rating, review.Date, review.Edited, review.ReviewId).Scan(&reviewId)
 	if err != nil {
 		return nil, err
 	}

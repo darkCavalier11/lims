@@ -20,6 +20,8 @@ func TestIssueBook(t *testing.T) {
 	testIssueBook.BookId = bookId
 	Lib.AddBook(&testBook)
 	Lib.AddUser(&testUser)
+	defer Lib.DeleteBook(bookId)
+	defer Lib.DeleteUser(userId)
 
 	// Issue a book
 	retIssueId, err := Lib.IssueBook(&testIssueBook)
@@ -40,6 +42,5 @@ func TestIssueBook(t *testing.T) {
 	require.Nil(t, err, "error ", err)
 	require.Nil(t, retIssueId, "invalid issue id", err)
 	require.True(t, *isAvailable, "book is  unavailable", err)
-	Lib.DeleteBook(bookId)
-	Lib.DeleteUser(userId)
+
 }

@@ -1,6 +1,8 @@
 package db
 
 import (
+	"fmt"
+	"math/rand"
 	"time"
 
 	"github.com/darkCavalier11/lims/models"
@@ -17,7 +19,7 @@ const (
 var testBook = models.Book{
 	BookId:      "",
 	Isbn:        "123456789",
-	Title:       "Testbook",
+	Title:       fmt.Sprintf("Testbook %v", rand.Int63()),
 	Subtitle:    "None",
 	Author:      "None",
 	Published:   "1990",
@@ -25,7 +27,7 @@ var testBook = models.Book{
 	Pages:       44,
 	Description: "description",
 	ImageUrl:    "url",
-	Rating:      4.3,
+	Rating:      rand.Float64() * 5,
 }
 
 var testUser = models.User{
@@ -33,7 +35,7 @@ var testUser = models.User{
 	FirstName: "Test",
 	LastName:  "User",
 	Gender:    "Male",
-	Email:     "test@user.com",
+	Email:     fmt.Sprintf("test%v@user.com", rand.Int63()),
 	Password:  "123456",
 	IsAdmin:   false,
 }

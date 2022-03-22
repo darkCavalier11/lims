@@ -1,9 +1,13 @@
 package db
 
 import (
+	"fmt"
+	"github.com/darkCavalier11/lims/models"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
+	"math/rand"
 	"testing"
+	"time"
 )
 
 func TestAddBook(t *testing.T) {
@@ -51,5 +55,33 @@ func TestSearchBook(t *testing.T) {
 }
 
 func TestGetReviewsOfBook(t *testing.T) {
-
+	err := Connect(host, port, user, password, dbname)
+	defer Lib.db.Close()
+	require.Equal(t, err, nil)
+	bookId := uuid.New().String()
+	userId := uuid.New().String()
+	testBook.BookId = bookId
+	testUser.UserId = userId
+	Lib.AddBook(&testBook)
+	Lib.AddUser(&testUser)
+	defer Lib.DeleteBook(bookId)
+	defer Lib.DeleteUser(userId)
+	reviews := []*models.Review{}
+	for i := 0; i < 10; i++ {
+		var bookTestReview models.Review
+		bookTestReview.ReviewId = uuid.New().String()
+		bookTestReview.UserId = userId
+		bookTestReview.BookId = bookId
+		bookTestReview.Comment = fmt.Sprintf("comment no %v", i)
+		bookTestReview.Rating = rand.Intn(6)
+		bookTestReview.Edited = false
+		bookTestReview.Date = time.Now().Format(time.RFC3339)
+		reviews = append(reviews, &bookTestReview)
+	}
+	for _, r := range reviews {
+		Lib.AddReview(r)
+	}
+	retReviews, err := Lib.GetReviewsOfBook(bookId)
+	require.Equal(t, err, nil, err)
+	require.EqualValues(t, retReviews, reviews, "invalid reviews")
 }

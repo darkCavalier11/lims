@@ -176,7 +176,7 @@ func TestIssueBook(t *testing.T) {
 	Lib.DeleteUser(userId)
 }
 
-func TestAddReview(t *testing.T) {
+func TestAddEditDeleteReview(t *testing.T) {
 	err := Connect(host, port, user, password, dbname)
 	defer Lib.db.Close()
 	require.Nil(t, err, "unable to connect to db")
@@ -190,9 +190,20 @@ func TestAddReview(t *testing.T) {
 	testReview.BookId = bookId
 	Lib.AddBook(&testBook)
 	Lib.AddUser(&testUser)
+
 	retIssueId, err := Lib.AddReview(&testReview)
 	require.Equal(t, err, nil, "error adding review to the book", err)
 	require.Equal(t, reviewId, *retIssueId, "invalid issue id")
+
+	testReview.Date = time.Now().Format(time.RFC3339)
+	testReview.Edited = true
+	testReview.Rating = 4
+	testReview.Comment = "edited comment"
+
+	retIssueId, err = Lib.EditReview(&testReview)
+	require.Equal(t, err, nil, "error deleting review from the book", err)
+	require.Equal(t, reviewId, *retIssueId, "invalid issue id")
+
 	retIssueId, err = Lib.DeleteReview(reviewId)
 	require.Equal(t, err, nil, "error deleting review from the book", err)
 	require.Equal(t, reviewId, *retIssueId, "invalid issue id")

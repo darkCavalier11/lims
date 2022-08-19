@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/darkCavalier11/lims/models"
 	"log"
 
 	"github.com/darkCavalier11/lims/db"
+	"github.com/darkCavalier11/lims/models"
 )
 
 var testUser = models.User{
@@ -31,16 +31,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("Unable to connect to db %v", err)
 	}
-	//bookQuery := flag.String("title", "", "Title of the book to query")
-	//flag.Parse()
-	//book, err := db.Lib.SearchBook(*bookQuery)
-	//if err != nil {
-	//	log.Fatalf("Unable to query book %v", err)
-	//}
-	//fmt.Println(book[0].BookId)
-	user, err := db.Lib.AddUser(&testUser)
-	if err != nil {
-		log.Fatalf("Error %v", err)
-	}
-	fmt.Println(user)
+	bookList, _ := db.Lib.SearchBook("c")
+	fmt.Println(bookList[0])
 }
